@@ -4,8 +4,10 @@ Display::Display() : display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET) {}
 
 void Display::begin() {
     if (!display.begin(SSD1306_I2C_ADDRESS, OLED_RESET)) {
+        Serial.println("SSD1306 allocation failed");
         for (;;);
     }
+    Serial.println("SSD1306 initialized successfully");
     display.clearDisplay();
     display.display();
 }

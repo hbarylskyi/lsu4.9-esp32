@@ -7,6 +7,7 @@ UART uart;
 
 void setup() {
   Serial.begin(115200);
+  delay(300); // Wait for Serial to initialize
   Serial.println("Initializing display...");
   display.begin();
   Serial.println("Display initialized.");

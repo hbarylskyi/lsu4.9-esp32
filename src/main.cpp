@@ -11,19 +11,17 @@ void setup() {
   Serial.println("Initializing display...");
   display.begin();
   Serial.println("Display initialized.");
-  uart.begin();
 }
 
 void loop() {
-  Serial.println("Reading AFR value...");
-  float afr = uart.readAFR();
-  Serial.print("AFR: ");
-  Serial.println(afr);
-  int rpm = 0; // Placeholder for RPM value
-  Serial.println("Updating display with AFR and RPM values...");
-  display.showData(afr, rpm);
-  Serial.println("Display updated.");
-  delay(1000);
+  Serial.println("Rendering static message on display...");
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.print("System Initialized");
+  display.display();
+  delay(5000); // Delay to keep the message on screen
 }
 
 // put function definitions here:

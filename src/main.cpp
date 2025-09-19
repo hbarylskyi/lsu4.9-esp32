@@ -1,15 +1,20 @@
 #include <Arduino.h>
+#include "display.h"
+#include "uart.h"
 
-// put function declarations here:
-int myFunction(int, int);
+Display display;
+UART uart;
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  display.begin();
+  uart.begin();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  float afr = uart.readAFR();
+  int rpm = 0; // Placeholder for RPM value
+  display.showData(afr, rpm);
+  delay(1000);
 }
 
 // put function definitions here:

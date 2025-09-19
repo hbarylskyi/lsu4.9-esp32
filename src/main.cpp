@@ -11,6 +11,7 @@ void setup() {
   Serial.println("Initializing display...");
   display.begin();
   Serial.println("Display initialized.");
+  uart.begin();
 }
 
 void loop() {

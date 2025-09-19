@@ -1,25 +1,20 @@
 #include "display.h"
 
-Display::Display() : display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET) {}
+Display::Display() : u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE) {}
 
 void Display::begin() {
-    if (!display.begin(SSD1306_I2C_ADDRESS, OLED_RESET)) {
-        Serial.println("SSD1306 allocation failed");
-        for (;;);
-    }
-    Serial.println("SSD1306 initialized successfully");
-    display.clearDisplay();
-    display.display();
+    u8g2.begin();
+    Serial.println("U8g2 initialized successfully");
 }
 
 void Display::showData(float afr, int rpm) {
-    display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(SSD1306_WHITE);
-    display.setCursor(0, 0);
-    display.print("AFR: ");
-    display.println(afr);
-    display.print("RPM: ");
-    display.println(rpm);
-    display.display();
+    u8g2.clearBuffer();
+    u8g2.setFont(u8g2_font_ncenB08_tr);
+    u8g2.drawStr(0, 10, "AFR: ");
+    u8g2.setCursor(30, 10);
+    u8g2.print(afr);
+    u8g2.drawStr(0, 20, "RPM: ");
+    u8g2.setCursor(30, 20);
+    u8g2.print(rpm);
+    u8g2.sendBuffer();
 }

@@ -6,9 +6,14 @@ void AFR::begin() {
     serial.begin(115200, SERIAL_8N1, 20, 21); // RX, TX pins
 
 bool AFR::readUARTData(uint8_t* buffer, size_t length) {
-    if (serial.available() >= length) {
-        serial.readBytes(buffer, length);
-        return true;
+    while (serial.available() > 0) {
+        if (serial.read() == 0x01) {
+            if (serial.available() >= length - 1) {
+                buffer[0] = 0x01;
+                serial.readBytes(buffer + 1, length - 1);
+                return true;
+            }
+        }
     }
     return false;
 }

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "display.h"
 #include "uart.h"
+#include "scan_i2c.h"
 #include <Wire.h>
 
 #define SDA_PIN 8   // your chosen SDA pin
@@ -20,6 +21,7 @@ void setup() {
   Serial.println("Display initialized.");
   delay(1000); // prevent watchdog reset
   uart.begin();
+  scanI2CDevices(); // Call the I2C scan function if needed
 }
 
 void loop() {

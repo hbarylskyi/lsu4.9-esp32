@@ -1,19 +1,6 @@
-#include <Arduino.h>
-#include <Wire.h>
+#include "scan_i2c.h"
 
-#define SDA_PIN 8   // your chosen SDA pin
-#define SCL_PIN 10  // your chosen SCL pin
-
-void setup() {
-  Serial.begin(115200);
-  delay(1000);
-  Serial.println("\nI2C Scanner starting...");
-
-  // Initialize I2C on your chosen pins
-  Wire.begin(SDA_PIN, SCL_PIN);
-}
-
-void loop() {
+void scanI2CDevices() {
   byte error, address;
   int nDevices = 0;
 

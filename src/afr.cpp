@@ -17,7 +17,7 @@ bool AFR::readUARTData() {
         if (*(it + 3) == 0x02) {
             buffer[0] = 0x01;
             std::copy(it + 1, it + 8, buffer + 1);
-            localBuffer.erase(localBuffer.begin(), it + 8);
+            localBuffer.erase(it, it + 8);
             return true;
         }
         it = std::find(it + 1, localBuffer.end(), 0x01);

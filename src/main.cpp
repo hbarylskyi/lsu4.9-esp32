@@ -17,16 +17,19 @@ void setup() {
   
   Wire.begin(SDA_PIN, SCL_PIN);
   display.begin();
-  afr_uart.begin();
+  // afr_uart.begin();
 
   Serial.println("all sensors initialized.");
   
   // scanI2CDevices(); // Call the I2C scan function if needed
+  display.showData(0, 0);
 }
 
 void loop() {
+  Serial.println("loop.");
+
   uint8_t buffer[9];
-  if (afr_uart.readUARTData(buffer, sizeof(buffer))) {
+  if (afr_uart.readUARTData()) {
     float afr = afr_uart.parseAFR(buffer);
     float temperature = afr_uart.parseTemperature(buffer);
     int rpm = 1000; // Placeholder for RPM value, replace with actual reading if available

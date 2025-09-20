@@ -7,7 +7,7 @@ class AFR {
 public:
     AFR();
     void begin();
-    bool readUARTData(uint8_t* buffer, size_t length);
+    bool readUARTData();
     float parseAFR(const uint8_t* buffer);
     float parseTemperature(const uint8_t* buffer);
 

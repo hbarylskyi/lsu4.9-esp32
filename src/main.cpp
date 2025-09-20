@@ -17,6 +17,7 @@ void setup() {
   
   Wire.begin(SDA_PIN, SCL_PIN);
   display.begin();
+  afr_uart.begin();
   // afr_uart.begin();
 
   Serial.println("all sensors initialized.");
@@ -26,19 +27,23 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("loop.");
-
-  uint8_t buffer[9];
-  if (afr_uart.readUARTData()) {
-    float afr = afr_uart.parseAFR(buffer);
-    float temperature = afr_uart.parseTemperature(buffer);
-    int rpm = 1000; // Placeholder for RPM value, replace with actual reading if available
-    display.showData(afr, rpm);
-    Serial.print("AFR: ");
-    Serial.print(afr);
-    Serial.print(" Temperature: ");
-    Serial.println(temperature);
-  }
-  
-  delay(1000); // Update every second
+    static unsigned long lastReadTime = 0;                                                                               
+  unsigned long currentTime = millis();                                                                                
+                                                                                                                       
+  if (currentTime - lastReadTime >= 50) {                                                                              
+    afr_uart.readUARTData();                                                                                           
+    lastReadTime = currentTime;                                                                                        
+  }                                                                                                                    
+                                                                                                                       
+  float afr = afr_uart.getLatestAFR();                                                                                 
+  int temperature = afr_uart.getLatestTemperature();                                                                   
+  int rpm = 1000; // Placeholder for RPM value, replace with actual reading if available                               
+  display.showData(afr, rpm);                                                                                          
+                                                                                                                       
+  Serial.print("AFR: ");                                                                                               
+  Serial.print(afr);                                                                                                   
+  Serial.print(" Temperature: ");                                                                                      
+  Serial.println(temperature);                                                                                         
+                                                                                                                       
+  delay(50); // Main loop delay  
 }

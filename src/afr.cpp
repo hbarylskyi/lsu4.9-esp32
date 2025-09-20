@@ -1,47 +1,59 @@
 #include "afr.h"
 
-AFR::AFR() : serial(1) {}
+AFR::AFR() : serial(1), latestAFR(0.0), latestTemperature(0) {} 
 
-void AFR::begin() {
-    serial.begin(115200, SERIAL_8N1, 20, 21); // RX, TX pins
+void AFR::begin()
+{
+    serial.begin(115200, SERIAL_8N1, 5, -1); // RX, TX pins
 }
-bool AFR::readUARTData() {
-    static uint8_t localBuffer[64];
-    static size_t bufferIndex = 0;
-    uint8_t afrByte  = 0;
-    uint8_t tempByte = 0;
 
-    // Collect new bytes
-    while (serial.available() > 0 && bufferIndex < sizeof(localBuffer)) {
-        localBuffer[bufferIndex++] = serial.read();
+bool AFR::readUARTData()
+{
+    uint8_t buffer[1024];
+    static size_t bufferIndex = 0;
+    uint8_t afrByte = 0;
+    uint8_t tempByte = 0;
+    size_t readCount = 0;
+
+    int available = serial.available();
+    Serial.print(" Available bytes: ");
+    Serial.print(available);
+
+    if (available < 16)
+    {
+        return false; // Not enough data
     }
 
-    // Scan for valid packet
-    for (int i = 0; i + 7 < bufferIndex; i++) {
-        if (localBuffer[i] == 0x01 && localBuffer[i + 3] == 0x02) {
-            // Found start of packet
-            afrByte  = localBuffer[i + 1]; // byte1
-            tempByte = localBuffer[i + 2]; // byte2
+    readCount = serial.readBytes(buffer, available);
+    // Scan backwards for the latest complete packet
+    // Packet format: 0x01, byte1, byte2, 0x02, 0x03, 0x04
+    for (int i = readCount - 6; i >= 0; i--)
+    {
+        if (buffer[i] == 0x01 &&
+            buffer[i + 3] == 0x02 &&
+            buffer[i + 4] == 0x03 &&
+            buffer[i + 5] == 0x04)
+        {   
+            // Extract data bytes
+            uint8_t byte1 = buffer[i + 1];
+            uint8_t byte2 = buffer[i + 2]; 
 
-            // Remove everything up to end of this packet
-            int remaining = bufferIndex - (i + 8);
-            // memmove(localBuffer, localBuffer + i + 8, remaining);
-            bufferIndex = remaining;
-
-            return true; // Got a packet
+            float afr = byte1 / 10.0;
+            int temp = byte2 + 740;
+            
+             latestAFR = afr;                                                                                           
+            latestTemperature = temp; 
+            return true; // found the freshest packet
         }
     }
 
-    // If buffer is too full without finding packet, reset
-    if (bufferIndex > 56) bufferIndex = 0;
-
     return false;
-}
-
-float AFR::parseAFR(const uint8_t* buffer) {
-    return buffer[1] / 10.0;
-}
-
-float AFR::parseTemperature(const uint8_t* buffer) {
-    return buffer[2] + 740;
-}
+}                                                                                                                      
+                                                                                                                       
+float AFR::getLatestAFR() const {                                                                                      
+    return latestAFR;                                                                                                  
+}                                                                                                                      
+                                                                                                                       
+int AFR::getLatestTemperature() const {                                                                                
+    return latestTemperature;                                                                                          
+}      

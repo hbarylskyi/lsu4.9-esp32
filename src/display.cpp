@@ -1,9 +1,11 @@
 #include "display.h"
 
-Display::Display() : u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE, /* clock=*/ U8X8_PIN_NONE, /* data=*/ U8X8_PIN_NONE, /* cs=*/ U8X8_PIN_NONE, /* dc=*/ U8X8_PIN_NONE, /* reset=*/ U8X8_PIN_NONE) {}
+Display::Display() : u8g2(U8G2_R0) {}
 
 void Display::begin() {
     u8g2.begin();
+    u8g2.setI2CAddress(0x3C*2);
+
     Serial.println("U8g2 initialized successfully");
 }
 

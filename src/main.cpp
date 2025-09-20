@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "display.h"
-#include "uart.h"
+#include "afr.h"
 #include "scan_i2c.h"
 #include <Wire.h>
 
@@ -8,25 +8,26 @@
 #define SCL_PIN 10  // your chosen SCL pin
 
 Display display;
-UART uart;
+AFR afr_uart;
 
 void setup() {
   Serial.begin(115200);
   delay(300); // Wait for Serial to initialize
+  Serial.println("starting.");
   
   Wire.begin(SDA_PIN, SCL_PIN);
-
-  Serial.println("Initializing display...");
   display.begin();
-  Serial.println("Display initialized.");
-  delay(1000); // prevent watchdog reset
-  uart.begin();
-  scanI2CDevices(); // Call the I2C scan function if needed
+  afr_uart.begin();
+
+  Serial.println("all sensors initialized.");
+  
+  // scanI2CDevices(); // Call the I2C scan function if needed
 }
 
 void loop() {
-  Serial.println("Rendering static message on display...");
-  delay(1000); // prevent watchdog reset
-  display.showData(14.7, 3000); // Example AFR and RPM values
-  Serial.println("Message rendered.");
+  int afr = afr_uart.readAFR();;
+  int rpm = 1000; // Placeholder for RPM value, replace with actual reading if available
+  display.showData(afr, rpm);
+  
+  delay(1000); // Update every second
 }

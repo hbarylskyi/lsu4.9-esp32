@@ -1,11 +1,11 @@
-#ifndef UART_H
-#define UART_H
+#ifndef AFR_H
+#define AFR_H
 
 #include <HardwareSerial.h>
 
-class UART {
+class AFR {
 public:
-    UART();
+    AFR();
     void begin();
     float readAFR();
 

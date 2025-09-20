@@ -7,26 +7,24 @@ void AFR::begin() {
 }
 
 bool AFR::readUARTData() {
-    static std::vector<uint8_t> localBuffer;
-    while (serial.available() > 0) {
-        localBuffer.push_back(serial.read());
+    static uint8_t localBuffer[64];
+    static size_t bufferIndex = 0;
+
+    while (serial.available() > 0 && bufferIndex < sizeof(localBuffer)) {
+        localBuffer[bufferIndex++] = serial.read();
     }
 
-    auto it = std::find(localBuffer.begin(), localBuffer.end(), 0x01);
-    while (it != localBuffer.end() && std::distance(it, localBuffer.end()) >= 8) {
-        if (*(it + 3) == 0x02) {
-            buffer[0] = 0x01;
-            std::copy(it + 1, it + 8, buffer + 1);
-            localBuffer.erase(it, it + 8);
+    for (size_t i = 0; i <= bufferIndex - 8; ++i) {
+        if (localBuffer[i] == 0x01 && localBuffer[i + 3] == 0x02) {
+            std::copy(localBuffer + i, localBuffer + i + 8, buffer);
+            bufferIndex -= (i + 8);
+            std::memmove(localBuffer, localBuffer + i + 8, bufferIndex);
             return true;
         }
-        it = std::find(it + 1, localBuffer.end(), 0x01);
     }
 
-    if (it != localBuffer.end()) {
-        localBuffer.erase(localBuffer.begin(), it);
-    } else {
-        localBuffer.clear();
+    if (bufferIndex >= 8) {
+        bufferIndex = 0; // Reset if no valid data found
     }
 
     return false;

@@ -25,9 +25,17 @@ void setup() {
 }
 
 void loop() {
-  int afr = afr_uart.readAFR();;
-  int rpm = 1000; // Placeholder for RPM value, replace with actual reading if available
-  display.showData(afr, rpm);
+  uint8_t buffer[9];
+  if (afr_uart.readUARTData(buffer, sizeof(buffer))) {
+    float afr = afr_uart.parseAFR(buffer);
+    float temperature = afr_uart.parseTemperature(buffer);
+    int rpm = 1000; // Placeholder for RPM value, replace with actual reading if available
+    display.showData(afr, rpm);
+    Serial.print("AFR: ");
+    Serial.print(afr);
+    Serial.print(" Temperature: ");
+    Serial.println(temperature);
+  }
   
   delay(1000); // Update every second
 }

@@ -4,7 +4,6 @@ AFR::AFR() : serial(1) {}
 
 void AFR::begin() {
     serial.begin(115200, SERIAL_8N1, 20, 21); // RX, TX pins
-}
 
 bool AFR::readUARTData(uint8_t* buffer, size_t length) {
     if (serial.available() >= length) {

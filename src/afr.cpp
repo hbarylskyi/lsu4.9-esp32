@@ -6,30 +6,30 @@ void AFR::begin() {
     serial.begin(115200, SERIAL_8N1, 20, 21); // RX, TX pins
 }
 
-uint8_t* buffer = new uint8_t[8];
-
-// Read data from UART and validate packet structure
 bool AFR::readUARTData() {
+    static std::vector<uint8_t> localBuffer;
     while (serial.available() > 0) {
-        uint8_t b = serial.read();
-
-        if (b == 0x01) { // packet start
-            size_t got = serial.readBytes(buffer + 1, length - 1);
-            if (got == length - 1) {
-                buffer[0] = 0x01;
-
-                // Validate static sequence
-                if (buffer[3] == 0x02 &&
-                    buffer[4] == 0x03 &&
-                    buffer[5] == 0x04 &&
-                    buffer[6] == 0x05 &&
-                    buffer[7] == 0x06) {
-                    return true; // valid packet
-                }
-            }
-        }
+        localBuffer.push_back(serial.read());
     }
-    return false; // nothing valid
+
+    auto it = std::find(localBuffer.begin(), localBuffer.end(), 0x01);
+    while (it != localBuffer.end() && std::distance(it, localBuffer.end()) >= 8) {
+        if (*(it + 3) == 0x02) {
+            buffer[0] = 0x01;
+            std::copy(it + 1, it + 8, buffer + 1);
+            localBuffer.erase(localBuffer.begin(), it + 8);
+            return true;
+        }
+        it = std::find(it + 1, localBuffer.end(), 0x01);
+    }
+
+    if (it != localBuffer.end()) {
+        localBuffer.erase(localBuffer.begin(), it);
+    } else {
+        localBuffer.clear();
+    }
+
+    return false;
 }
 
 float AFR::parseAFR(const uint8_t* buffer) {

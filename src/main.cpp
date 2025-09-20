@@ -38,7 +38,7 @@ void loop() {
   float afr = afr_uart.getLatestAFR();                                                                                 
   int temperature = afr_uart.getLatestTemperature();                                                                   
   int rpm = 1000; // Placeholder for RPM value, replace with actual reading if available                               
-  display.showData(afr, rpm);                                                                                          
+  display.showData(afr, rpm, temperature);                                                                                          
                                                                                                                        
   Serial.print("AFR: ");                                                                                               
   Serial.print(afr);                                                                                                   

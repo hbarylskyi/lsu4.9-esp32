@@ -20,7 +20,7 @@ bool AFR::readUARTData()
     size_t readCount = 0;
 
     int available = serial.available();
-    Serial.print(" Available bytes: ");
+    Serial.print("Available bytes: ");
     Serial.print(available);
     Serial.print(" ");
 

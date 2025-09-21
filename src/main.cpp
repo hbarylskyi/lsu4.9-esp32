@@ -23,7 +23,7 @@ void setup() {
   Serial.println("all sensors initialized.");
   
   // scanI2CDevices(); // Call the I2C scan function if needed
-  display.showData(0, 0);
+  display.showData(0.0, 0, 0);
 }
 
 void loop() {

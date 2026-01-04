@@ -1,4 +1,4 @@
-#include "scan_i2c.h"
+#include "i2c_helpers.h"
 
 void scanI2CDevices() {
   byte error, address;
@@ -30,4 +30,25 @@ void scanI2CDevices() {
   }
 
   delay(3000); // wait before next scan
+}
+
+
+// Function to check I2C device connection
+bool checkI2CDevice(uint8_t address, const char *deviceName)
+{
+  Wire.beginTransmission(address);
+  uint8_t error = Wire.endTransmission();
+
+  if (error == 0)
+  {
+    Serial.print(deviceName);
+    Serial.println(" connected successfully");
+    return true;
+  }
+  else
+  {
+    Serial.print(deviceName);
+    Serial.println(" connection failed");
+    return false;
+  }
 }

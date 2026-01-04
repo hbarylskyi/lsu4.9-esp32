@@ -7,7 +7,7 @@ class AFR {
 public:
     AFR();
     void begin();
-    bool readUARTData();
+    void update();
     float getLatestAFR() const;                                                                                        
     int getLatestTemperature() const;  
     
@@ -15,7 +15,9 @@ public:
 private:
     HardwareSerial serial;                                                                                             
     float latestAFR;                                                                                                   
-    int latestTemperature;  
+    int latestTemperature;
+    unsigned long lastUpdateTime;
+    static const unsigned long UPDATE_INTERVAL = 50; // Update every 50ms
 };
 
 #endif

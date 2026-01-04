@@ -38,7 +38,7 @@ void Display::showData(float afr, int rpm, int temperature)
 
     // --- RPM below AFR ---
     u8g2.setFont(u8g2_font_12x6LED_tf);
-    u8g2.setCursor(10, afrY + 16);
+    u8g2.setCursor(4, afrY + 16);
     u8g2.print(rpm);
 
     u8g2.sendBuffer();

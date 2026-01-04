@@ -4,29 +4,33 @@
 // Packet format: 0x01, byte1, byte2, 0x02, 0x03, 0x04
 // byte1: AFR * 10 (e.g., 135 for AFR 13.5)
 // byte2: Temperature - 740 (e.g., 25C -> 25 + 740 = 765)
-AFR::AFR() : serial(1), latestAFR(0.0), latestTemperature(0) {}
+AFR::AFR() : serial(1), latestAFR(0.0), latestTemperature(0), lastUpdateTime(0) {}
 
 void AFR::begin()
 {
     serial.begin(115200, SERIAL_8N1, 5, -1); // RX, TX pins
+    lastUpdateTime = millis();
 }
 
-bool AFR::readUARTData()
+void AFR::update()
 {
+    unsigned long currentTime = millis();
+    
+    // Only update if enough time has passed
+    if (currentTime - lastUpdateTime < UPDATE_INTERVAL) {
+        return;
+    }
+    
+    lastUpdateTime = currentTime;
+    
     uint8_t buffer[512];
-    static size_t bufferIndex = 0;
-    uint8_t afrByte = 0;
-    uint8_t tempByte = 0;
     size_t readCount = 0;
 
     int available = serial.available();
-    Serial.print("Available bytes: ");
-    Serial.print(available);
-    Serial.print(" ");
-
+    
     if (available < 16)
     {
-        return false; // Not enough data
+        return; // Not enough data
     }
 
     readCount = serial.readBytes(buffer, available);
@@ -47,11 +51,9 @@ bool AFR::readUARTData()
 
             latestAFR = afr;
             latestTemperature = temp;
-            return true; // found the freshest packet
+            break; // found the freshest packet
         }
     }
-
-    return false;
 }
 
 float AFR::getLatestAFR() const
